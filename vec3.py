@@ -1,3 +1,5 @@
+import math
+
 class vec3:
     def __init__(self, x, y, z):
         """Инициализация 3D вектора."""
@@ -76,6 +78,27 @@ class vec3:
     def from_tuple(cls, tup):
         """Создание вектора из кортежа."""
         return cls(tup[0], tup[1], tup[2])
+
+    def angle_between(self, other):
+        """Вычисляет угол между двумя векторами в радианах."""
+        self._check_vector(other)
+        cos_angle = self.dot(other) / (self.length() * other.length())
+        return math.acos(cos_angle)
+
+    def distance_to(self, other):
+        """Вычисляет расстояние между двумя векторами."""
+        self._check_vector(other)
+        return ((self.x - other.x) ** 2 + (self.y - other.y) ** 2 + (self.z - other.z) ** 2) ** 0.5
+
+    def reflect(self, normal):
+        """Отражает вектор от поверхности, определяемой нормальным вектором."""
+        self._check_vector(normal)
+        dot_product = self.dot(normal)
+        return vec3(
+            self.x - 2 * dot_product * normal.x,
+            self.y - 2 * dot_product * normal.y,
+            self.z - 2 * dot_product * normal.z
+        )
 
     def __repr__(self):
         """Строковое представление вектора."""
