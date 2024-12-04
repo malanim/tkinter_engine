@@ -52,19 +52,18 @@ def main():
     fps_label = tk.Label(root, text="FPS: 0", font=("Arial", 12))
     fps_label.pack()
     frame_count = 0
-    center = (200, 200)  # Центр шара
-    radius = 50  # Радиус шара
-    camera_angle = 0  # Угол поворота камеры
+    center = (200, 200) # Центр шара
+    radius = 50 # Радиус шара
+    camera_angle = 0 # Угол поворота камеры
     last_time = time.time()  # Инициализация last_time
-    last_fps_time = time.time()  # Инициализация last_fps_time
+    fps_last_time = time.time()  # Инициализация времени последнего обновления FPS
     
     # Фиксированное направление света (сверху и слегка сбоку)
     light_direction = vec3(0.5, -1, 0.5).normalize()
 
     def update_sphere():
-        nonlocal camera_angle, frame_count, last_fps_time
+        nonlocal camera_angle, frame_count, last_time, fps_last_time
         
-        nonlocal last_time
         current_time = time.time()
         delta_time = current_time - last_time
         last_time = current_time
@@ -75,17 +74,16 @@ def main():
         draw_sphere(canvas, center, radius, light_direction, camera_angle)
 
         # Обновление угла камеры
-        camera_angle += 0.25  # Увеличиваем скорость вращения (не зависит от FPS)
+        camera_angle += delta_time * 0.5  # Увеличиваем скорость вращения в зависимости от времени
         if camera_angle >= 2 * math.pi:
             camera_angle = 0
         # Обновление счетчика кадров
         frame_count += 1
-        if current_time - last_fps_time >= 1:  # Обновление FPS каждую секунду
+        if current_time - fps_last_time >= 1:  # Обновление FPS каждую секунду
             fps_label.config(text=f"FPS: {frame_count}")
-            last_fps_time = current_time
-            frame_count = 0
+            fps_last_time = current_time  # Обновление времени последнего обновления FPS
+            frame_count = 0  # Сброс счетчика кадров
 
-        # Запланировать следующий кадр
         root.after(8, update_sphere)  # ~120 FPS
 
     # Запуск анимации
