@@ -43,7 +43,7 @@ def draw_sphere(canvas, center, radius, light_direction, camera_angle):
 def main():
     # Создание основного окна
     root = tk.Tk()
-    root.title("Координатная плоскость")
+    root.title("3d viewer")
 
     # Настройка канваса
     canvas = tk.Canvas(root, width=400, height=400, bg="black")
