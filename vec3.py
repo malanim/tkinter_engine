@@ -49,7 +49,7 @@ class vec3:
         length = self.length()
         if length == 0:
             raise ValueError("Невозможно нормализовать нулевой вектор.")
-        return self.divide(length)
+        return self.operate(length, 'divide')
 
     def dot(self, other):
         """Скалярное произведение двух векторов."""

@@ -1,14 +1,44 @@
 import tkinter as tk
-from vec2 import add, subtract, multiply, divide
+import math
 import time
+from vec3 import vec3
 
-def draw_circle(canvas, x, y, r):
-    """Функция для рисования заполненного круга."""
-    # Создание градиента
-    for i in range(r):
-        color_value = int(255 * (1 - i / r))  # Вычисление значения цвета
-        color = f'#{color_value:02x}{color_value:02x}{255:02x}'  # Градиент от синего к прозрачному
-        canvas.create_oval(x - r + i, y - r + i, x + r - i, y + r - i, fill=color, outline="")
+def draw_sphere(canvas, center, radius, light_direction, camera_angle):
+    """Функция для рисования 3D шара с учетом освещения."""
+    for i in range(-radius, radius):
+        for j in range(-radius, radius):
+            if i**2 + j**2 <= radius**2:  # Проверка, находится ли точка внутри шара
+                # Вычисление координат точки на поверхности шара
+                x = i
+                y = j
+                z = math.sqrt(radius**2 - i**2 - j**2)
+
+                # Создание нормали для текущей точки (относительно центра шара)
+                normal = vec3(x, y, z).normalize()
+
+                # Поворот нормали вокруг оси Y
+                rotated_normal = vec3(
+                    normal.x * math.cos(camera_angle) + normal.z * math.sin(camera_angle),
+                    normal.y,
+                    -normal.x * math.sin(camera_angle) + normal.z * math.cos(camera_angle)
+                )
+
+                # Вычисление интенсивности освещения
+                intensity = rotated_normal.dot(light_direction)
+                
+                # Отрисовываем только освещенные пиксели
+                if intensity > 0:
+                    # Вычисление цвета с учетом базового цвета (синего)
+                    # Интенсивность определяет как сильно цвет будет отличаться от черного
+                    blue = int(255 * intensity)
+                    other = int(128 * intensity)  # Другие компоненты для создания градиента
+                    color = f'#{other:02x}{other:02x}{blue:02x}'
+
+                    # Отрисовка пикселя
+                    screen_x = center[0] + i
+                    screen_y = center[1] + j
+                    canvas.create_rectangle(screen_x, screen_y, screen_x + 1, screen_y + 1, 
+                                         fill=color, outline="")
 
 def main():
     # Создание основного окна
@@ -16,58 +46,43 @@ def main():
     root.title("Координатная плоскость")
 
     # Настройка канваса
-    canvas = tk.Canvas(root, width=400, height=400, bg="white")
+    canvas = tk.Canvas(root, width=400, height=400, bg="black")
     canvas.pack()
 
-    # Настройка начальных параметров круга и FPS
+    # Настройка начальных параметров
     fps_label = tk.Label(root, text="FPS: 0", font=("Arial", 12))
     fps_label.pack()
-    frame_count = 0  # Счетчик кадров
-    elapsed_time = 0
-    x, y, r = 200, 200, 50
-    speed = 50  # Скорость движения в пикселях в секунду
-    velocity = (2, 1)  # Вектор скорости
-    last_time = time.time()  # Время последнего обновления
-    last_update_time = 0  # Время последнего обновления FPS
+    frame_count = 0
+    center = (200, 200)  # Центр шара
+    radius = 50  # Радиус шара
+    camera_angle = 0  # Угол поворота камеры
+    
+    # Фиксированное направление света (сверху и слегка сбоку)
+    light_direction = vec3(0.5, -1, 0.5).normalize()
 
-    def update_circle():
-        nonlocal x, y, frame_count, last_update_time, last_time, velocity
+    def update_sphere():
+        nonlocal camera_angle, frame_count
         canvas.delete("all")  # Очистка канваса
-        draw_circle(canvas, x, y, r)  # Рисование круга
 
-        # Обновление координат на основе времени
-        current_time = time.time()
-        delta_time = current_time - last_time  # Время, прошедшее с последнего обновления
-        last_time = current_time  # Обновление времени последнего обновления
-        # Обновление координат с использованием вектора скорости
-        displacement = multiply(velocity, speed * delta_time)  # Вычисление смещения
-        x, y = add((x, y), displacement)  # Обновление координат
+        # Рисование шара
+        draw_sphere(canvas, center, radius, light_direction, camera_angle)
 
-        # Проверка границ канваса
-        if x - r <= 0 or x + r >= 400:
-            print(f"Before X change: {velocity}")  # Отладочное сообщение
-            velocity = (-velocity[0], velocity[1])  # Изменение направления по оси X
-            print(f"After X change: {velocity}")  # Отладочное сообщение
-        if y - r <= 0 or y + r >= 400:
-            print(f"Before Y change: {velocity}")  # Отладочное сообщение
-            velocity = (velocity[0], -velocity[1])  # Изменение направления по оси Y
-            print(f"After Y change: {velocity}")  # Отладочное сообщение
+        # Обновление угла камеры
+        camera_angle += 0.5  # Увеличиваем скорость вращения
+        if camera_angle >= 2 * math.pi:
+            camera_angle = 0
 
-        # Увеличение счетчика кадров
+        # Обновление счетчика кадров
         frame_count += 1
-
-        # Обновление FPS каждые 60 кадров
-        current_time = int(time.time() * 1000)  # Get current time in milliseconds
-        if current_time - last_update_time >= 1000:  # Каждую секунду
-            fps_label.config(text=f"FPS: {frame_count}")  # Обновление метки FPS
-            frame_count = 0  # Сброс счетчика кадров
-            last_update_time = current_time  # Обновление времени последнего обновления
+        if frame_count % 30 == 0:  # Обновление FPS каждые 30 кадров
+            fps_label.config(text=f"FPS: {frame_count}")
+            frame_count = 0
 
         # Запланировать следующий кадр
-        root.after(8, update_circle) # Примерно 120 FPS
+        root.after(8, update_sphere)  # ~120 FPS
 
     # Запуск анимации
-    update_circle()
+    update_sphere()
 
     # Запуск главного цикла
     root.mainloop()
