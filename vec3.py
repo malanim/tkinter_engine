@@ -12,24 +12,32 @@ class vec3:
         if not isinstance(other, vec3):
             raise TypeError("Операция возможна только с объектами vec3.")
 
-    def add(self, other):
-        self._check_vector(other)
-        """Сложение двух 3D векторов."""
-        return vec3(self.x + other.x, self.y + other.y, self.z + other.z)
-
-    def subtract(self, other):
-        """Вычитание второго вектора из первого."""
-        return vec3(self.x - other.x, self.y - other.y, self.z - other.z)
-
-    def multiply(self, scalar):
-        """Умножение вектора на скаляр."""
-        return vec3(self.x * scalar, self.y * scalar, self.z * scalar)
-
-    def divide(self, scalar):
-        """Деление вектора на скаляр."""
-        if scalar == 0:
-            raise ValueError("Деление на ноль невозможно.")
-        return vec3(self.x / scalar, self.y / scalar, self.z / scalar)
+    def operate(self, other, operation):
+        """Выполняет операцию с вектором или скаляром."""
+        if isinstance(other, vec3):
+            if operation == 'add':
+                return vec3(self.x + other.x, self.y + other.y, self.z + other.z)
+            elif operation == 'subtract':
+                return vec3(self.x - other.x, self.y - other.y, self.z - other.z)
+            elif operation == 'multiply':
+                return vec3(self.x * other.x, self.y * other.y, self.z * other.z)
+            elif operation == 'divide':
+                if other.x == 0 or other.y == 0 or other.z == 0:
+                    raise ValueError("Деление на ноль невозможно.")
+                return vec3(self.x / other.x, self.y / other.y, self.z / other.z)
+        elif isinstance(other, (int, float)):
+            if operation == 'add':
+                return vec3(self.x + other, self.y + other, self.z + other)
+            elif operation == 'subtract':
+                return vec3(self.x - other, self.y - other, self.z - other)
+            elif operation == 'multiply':
+                return vec3(self.x * other, self.y * other, self.z * other)
+            elif operation == 'divide':
+                if other == 0:
+                    raise ValueError("Деление на ноль невозможно.")
+                return vec3(self.x / other, self.y / other, self.z / other)
+        else:
+            raise TypeError("Операция возможна только с объектами vec3 или скалярами.")
 
     def length(self):
         """Возвращает длину вектора."""
