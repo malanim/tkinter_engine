@@ -8,9 +8,10 @@ class vec3:
         self.z = z
 
     def _check_vector(self, other):
-        """Проверка, является ли объект вектором."""
+        """Проверка, является ли объект вектором.""" 
         if not isinstance(other, vec3):
             raise TypeError("Операция возможна только с объектами vec3.")
+        # Удаляем ненужный возврат
 
     def operate(self, other, operation):
         """Выполняет операцию с вектором или скаляром."""
@@ -108,6 +109,26 @@ class vec3:
             self.z - 2 * dot_product * normal.z
         )
 
+    def add_vectors(vectors):
+        """Суммирует массив векторов."""
+        result = vec3(0, 0, 0)
+        for vector in vectors:
+            result = result.operate(vector, 'add')
+        return result
+
+    def subtract_vectors(vectors):
+        """Вычитает массив векторов из первого вектора."""
+        if not vectors:
+            raise ValueError("Список векторов не может быть пустым.")
+        result = vectors[0]
+        for vector in vectors[1:]:
+            result = result.operate(vector, 'subtract')
+        return result
+
+    def normalize_vectors(vectors):
+        """Нормализует массив векторов."""
+        return [vector.normalize() for vector in vectors]
+    
     def __repr__(self):
         """Строковое представление вектора."""
         return f"vec3({self.x}, {self.y}, {self.z})"
