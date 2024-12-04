@@ -29,7 +29,6 @@ def draw_sphere(canvas, center, radius, light_direction, camera_angle):
                 # Отрисовываем только освещенные пиксели
                 if intensity > 0:
                     # Вычисление цвета с учетом базового цвета (синего)
-                    # Интенсивность определяет как сильно цвет будет отличаться от черного
                     blue = int(255 * intensity)
                     other = int(128 * intensity)  # Другие компоненты для создания градиента
                     color = f'#{other:02x}{other:02x}{blue:02x}'
@@ -56,26 +55,34 @@ def main():
     center = (200, 200)  # Центр шара
     radius = 50  # Радиус шара
     camera_angle = 0  # Угол поворота камеры
+    last_time = time.time()  # Инициализация last_time
+    last_fps_time = time.time()  # Инициализация last_fps_time
     
     # Фиксированное направление света (сверху и слегка сбоку)
     light_direction = vec3(0.5, -1, 0.5).normalize()
 
     def update_sphere():
-        nonlocal camera_angle, frame_count
+        nonlocal camera_angle, frame_count, last_fps_time
+        
+        nonlocal last_time
+        current_time = time.time()
+        delta_time = current_time - last_time
+        last_time = current_time
+
         canvas.delete("all")  # Очистка канваса
 
         # Рисование шара
         draw_sphere(canvas, center, radius, light_direction, camera_angle)
 
         # Обновление угла камеры
-        camera_angle += 0.5  # Увеличиваем скорость вращения
+        camera_angle += 0.25  # Увеличиваем скорость вращения (не зависит от FPS)
         if camera_angle >= 2 * math.pi:
             camera_angle = 0
-
         # Обновление счетчика кадров
         frame_count += 1
-        if frame_count % 30 == 0:  # Обновление FPS каждые 30 кадров
+        if current_time - last_fps_time >= 1:  # Обновление FPS каждую секунду
             fps_label.config(text=f"FPS: {frame_count}")
+            last_fps_time = current_time
             frame_count = 0
 
         # Запланировать следующий кадр
