@@ -32,12 +32,12 @@ class Scene:
         """Установка камеры."""
         self.camera = camera
         
-    def render(self):
+    def render(self, render_mode='lighting'):
         """Отрисовка всей сцены."""
         self.canvas.delete("all")
         if self.camera:
             for obj in self.objects:
-                obj.draw(self.canvas, self.camera, self.lights)
+                obj.draw(self.canvas, self.camera, self.lights, render_mode)
                 
     def run(self):
         """Запуск главного цикла."""

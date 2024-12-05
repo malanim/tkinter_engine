@@ -1,4 +1,5 @@
 import time
+import tkinter as tk
 from vec3 import vec3
 from scene import Scene
 from camera import Camera
@@ -6,6 +7,8 @@ from light import Light
 from objects import Sphere
 
 def main():
+    # Глобальная переменная для режима отрисовки
+    render_mode = 'lighting'
     # Создание сцены
     scene = Scene(width=400, height=400)
     
@@ -20,6 +23,17 @@ def main():
     # Добавление сферы
     sphere = Sphere(vec3(200, 200, 0), 50)
     scene.add_object(sphere)
+    
+    # Обработчик переключения режима отрисовки
+    def toggle_render_mode(event):
+        nonlocal render_mode
+        if render_mode == 'lighting':
+            render_mode = 'outline'
+        else:
+            render_mode = 'lighting'
+    
+    # Привязка клавиши 'R' к переключению режима
+    scene.root.bind('r', toggle_render_mode)
     
     # Настройка анимации
     frame_count = 0
@@ -36,8 +50,8 @@ def main():
         # Обновление камеры
         camera.rotate(delta_time)
         
-        # Отрисовка сцены
-        scene.render()
+        # Отрисовка сцены с текущим режимом
+        scene.render(render_mode)
         
         # Обновление FPS
         frame_count += 1

@@ -16,8 +16,8 @@ class Sphere(Object3D):
         super().__init__(position)
         self.radius = radius
         
-    def draw(self, canvas, camera, lights):
-        """Отрисовка сферы с учетом освещения."""
+    def draw_with_lighting(self, canvas, camera, lights):
+        """Отрисовка сферы с освещением."""
         transform = camera.get_transform_matrix()
         
         for i in range(-self.radius, self.radius):
@@ -38,7 +38,7 @@ class Sphere(Object3D):
                     
                     # Вычисление суммарной интенсивности от всех источников света
                     total_intensity = sum(light.get_intensity(rotated_normal) for light in lights)
-                    total_intensity = min(1.0, total_intensity)  # Ограничиваем максимальную яркость
+                    total_intensity = min(1.0, total_intensity)
                     
                     if total_intensity > 0:
                         blue = int(255 * total_intensity)
@@ -52,3 +52,29 @@ class Sphere(Object3D):
                             screen_x + 1, screen_y + 1,
                             fill=color, outline=""
                         )
+
+    def draw_outline(self, canvas, camera):
+        """Отрисовка только контура сферы."""
+        transform = camera.get_transform_matrix()
+        
+        # Отрисовка контура сферы
+        for angle in range(360):
+            rad = math.radians(angle)
+            x = int(self.radius * math.cos(rad))
+            y = int(self.radius * math.sin(rad))
+            
+            screen_x = self.position.x + x
+            screen_y = self.position.y + y
+            
+            canvas.create_rectangle(
+                screen_x, screen_y,
+                screen_x + 1, screen_y + 1,
+                fill='white', outline=""
+            )
+            
+    def draw(self, canvas, camera, lights, render_mode='lighting'):
+        """Отрисовка сферы в зависимости от выбранного режима."""
+        if render_mode == 'lighting':
+            self.draw_with_lighting(canvas, camera, lights)
+        else:
+            self.draw_outline(canvas, camera)
