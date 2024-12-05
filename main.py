@@ -22,8 +22,6 @@ def main():
     # Добавление сферы
     sphere = Sphere(vec3(200, 200, 0), 50)
     scene.add_object(sphere)
-    sphere2 = Sphere(vec3(250, 200, 0), 50)
-    scene.add_object(sphere2)
     
     # Обработчик переключения режима отрисовки
     def toggle_render_mode(event):
