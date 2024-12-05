@@ -1,5 +1,4 @@
 import time
-import tkinter as tk
 from vec3 import vec3
 from scene import Scene
 from camera import Camera
@@ -13,7 +12,7 @@ def main():
     scene = Scene(width=400, height=400)
     
     # Добавление камеры
-    camera = Camera()
+    camera = Camera(position=vec3(300, 0, 0), up_vector=vec3(0, 1, 0))
     scene.set_camera(camera)
     
     # Добавление источника света
@@ -23,6 +22,8 @@ def main():
     # Добавление сферы
     sphere = Sphere(vec3(200, 200, 0), 50)
     scene.add_object(sphere)
+    sphere2 = Sphere(vec3(250, 200, 0), 50)
+    scene.add_object(sphere2)
     
     # Обработчик переключения режима отрисовки
     def toggle_render_mode(event):
